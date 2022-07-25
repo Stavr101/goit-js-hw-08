@@ -1,20 +1,50 @@
-const refs = {
-  form: document.querySelector('.feedback-form'),
-  textarea: document.querySelector('.feedback-form textarea'),
-};
+import throttle from 'lodash.throttle';
 
-refs.form.addEventListener('submit', onFormSubmit);
-refs.textarea.addEventListener('input', onTextareaInput);
+const form = document.querySelector('.feedback-form');
 
-function onFormSubmit(evt) {
-  evt.preventDefault();
+const LOCALSTORAGE_KEY = 'feedback-form-state';
 
-  evt.currentTarget.reset();
+form.addEventListener('submit', onFormSubmit);
+form.addEventListener('input', throttle(onTextareaInput, 500));
+
+populateTextarea();
+
+function onFormSubmit(event) {
+  event.preventDefault();
+
+  const formElements = event.currentTarget.elements;
+
+  const email = formElements.email.value;
+  const message = formElements.message.value;
+
+  const formDataElements = {
+    email,
+    message,
+  };
+  console.log(formDataElements);
+
+  form.reset();
 }
 
-function onTextareaInput(evt) {
-  const message = evt.currentTarget.value;
+function onTextareaInput() {
+  const email = form.elements.email.value;
+  const message = form.elements.message.value;
 
-  localStorage.setItem('fbk-message', message);
-  console.log(message);
+  const formDataElements = {
+    email,
+    message,
+  };
+
+  const formData = JSON.stringify(formDataElements);
+  localStorage.setItem(LOCALSTORAGE_KEY, formData);
+}
+
+function populateTextarea() {
+  const savedMessage = localStorage.getItem(LOCALSTORAGE_KEY);
+  const saveMessageValue = JSON.parse(savedMessage);
+
+  if (savedMessage) {
+    form.elements.email.value = saveMessageValue.email;
+    form.elements.message.value = saveMessageValue.message;
+  }
 }
