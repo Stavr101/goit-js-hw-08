@@ -23,7 +23,14 @@ function onFormSubmit(event) {
   };
   console.log(formDataElements);
 
-  form.reset();
+  if (email.length === 0 || message.length === 0) {
+    alert('Все поля должны быть заполнены');
+  } else {
+    console.log(formDataElements);
+    form.reset();
+  }
+
+  // form.reset();
 }
 
 function onTextareaInput() {
